@@ -132,7 +132,7 @@ def register():
         elif password != r_password:
             return render_template("exception/error.html", msg="رمز عبور یکسان نیست.")
         
-        elif not email.endswith("@gmail.com") or not email.endswith("@email.com"):
+        if not (email.endswith("@gmail.com") or email.endswith("@email.com")):
             return render_template("exception/error.html", msg="ایمیل نامعتبر")
         
         login_check = login(username, email, password)
