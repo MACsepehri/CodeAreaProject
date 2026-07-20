@@ -295,3 +295,8 @@ if (document.readyState === 'loading') {
 } else {
     setTimeout(initializeLobby, 100);
 }
+
+function exit_lobby() {
+    var lobbyID = document.getElementById("id").value;
+    window.location.href = "/leave_lobby&id="+lobbyID
+}
