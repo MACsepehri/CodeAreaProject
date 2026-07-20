@@ -2,6 +2,10 @@
 
 {% block head %}
 <style>
+    body {
+        overflow-x: hidden;
+    }
+
     .unselected {
         color: rgb(255, 103, 103);
     }
@@ -80,6 +84,7 @@
     <div class="show-lobby-id">
         <input type="text" id="lobby_id" value="{{ lobby.lobbyID }}" readonly>
         <button onclick="copy_element()">کپی لینک</button>
+        <button onclick="javascript:exit_lobby();">خروج از لابی.</button>
     </div>
 </div>
 
