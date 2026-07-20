@@ -40,7 +40,8 @@
         <p>تعداد افراد : <strong class="users-list">-</strong></p>
         <p>زبان برنامه نویسی: <strong id="programing-language" dir="ltr">-</strong></p>
         <p>درجه سختی: <strong id="defficulty">-</strong></p>
-        <p>شماره لابی: <strong>{{ lobby.lobbyID }}</strong></p>
+        <p>شماره لابی: <strong id="lobby-id">{{ lobby.lobbyID }}</strong></p>
+        <input type="hidden" value="{{ lobby.lobbyID }}" id="id">
     </div>
     {% if session.lobby_admin %}
         <div class="hr"></div>
