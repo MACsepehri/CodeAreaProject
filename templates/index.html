@@ -10,18 +10,18 @@
     <div class="login-box right">
         <h4>برای بازی کردن باید<br>حساب کاربری داشته باشید.</h4>
         <div class="login-form right">
-            <form action="/register" method="post">
+            <form action="/register" method="post" id="login-form">
                 <input type="text" placeholder="نام کاربری" name="username" id="input" required>
                 <br>
-                <input type="text" placeholder="ایمیل" name="email" id="input" required>
+                <input type="email" placeholder="ایمیل" name="email" id="input" required>
                 <br>
                 <input type="password" placeholder="رمز" name="password" id="input" required>
                 <br>
                 <input type="password" placeholder="تکرار رمز" name="repeat_password" id="input" required>
                 <br>
-                <input type="submit" value="ثبت نام" id="submit">
             </form>
-            <button class="password-state" onclick="password_state();">آشکار رمز</button>
+            <button value="ثبت نام" id="submit" onclick="javascript:password_is_week()">ثبت نام</button><br>
+            <button class="password-state" onclick="javascript:password_state();">آشکار رمز</button>
             <p style="width: 160px;">تمامی داده ها برای ورود هم صدق میکنند.</p>
         </div>
     </div>

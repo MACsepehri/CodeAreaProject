@@ -10,14 +10,24 @@ function redirect (url) {
 function password_state() {
     if (passwordState === "hide") {
         passwordState = "show";
-        password.type = "text"
-        repeat_password.type = "text"
+        password.type = "text";
+        repeat_password.type = "text";
         passwordButton.innerText = "پنهان رمز";
     }
     else {
         passwordState = "hide";
-        password.type = "password"
-        repeat_password.type = "password"
+        password.type = "password";
+        repeat_password.type = "password";
         passwordButton.innerText = "آشکار رمز";
+    }
+}
+
+function password_is_week() {
+    if (password != repeat_password) {
+        alert("رمز عبور ها برابر نیستند.");
+    }
+    else {
+        var form = document.getElementById("login-form");
+        form.submit();
     }
 }
