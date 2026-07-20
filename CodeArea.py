@@ -282,25 +282,33 @@ def start_game():
 def leave_lobby(lobbyID):
     if not session_check():
         return redirect("/")
-    
-    lobby_id = lobbyID
-    if lobby_id:
-        data = find_lobby_data(lobby_id)
-        if data:
-            username = session.get("data", {}).get("username")
-            
-            if username in data.get("users_list", []):
+
+    data = find_lobby_data(lobbyID)
+
+    if data:
+        username = session.get("data", {}).get("username")
+        if username == data["admin"]:
+            file_path = f"static/lobby/{data['admin']}-lobby.json"
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        else:
+            if username in data["users_list"]:
                 data["users_list"].remove(username)
-            
-            if "user_data" in data:
-                data["user_data"] = [user for user in data["user_data"] if user.get("name") != username]
-            
+
+            data["user_data"] = [
+                user for user in data["user_data"]
+                if user["name"] != username
+            ]
+
             data["users"] = len(data["users_list"])
-            
+
             with open(f"static/lobby/{data['admin']}-lobby.json", "w") as file:
                 json.dump(data, file, indent=4)
-    
+
     session["in_lobby"] = False
+    session["lobby_admin"] = False
+
     return redirect("/")
 
 @app.route("/debug_lobby/<lobbyID>")
