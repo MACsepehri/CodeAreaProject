@@ -129,8 +129,11 @@ def register():
         if not username or not email or not password:
             return render_template("exception/error.html", msg="همه فیلدها باید پر شوند.")
         
-        if password != r_password:
+        elif password != r_password:
             return render_template("exception/error.html", msg="رمز عبور یکسان نیست.")
+        
+        elif not email.endswith("@gmail.com") or not email.endswith("@email.com"):
+            return render_template("exception/error.html", msg="ایمیل نامعتبر")
         
         login_check = login(username, email, password)
         if not login_check:
