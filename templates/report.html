@@ -14,28 +14,25 @@
 <div class="title">
     <h2>ارسال پیام به ما</h2>
 </div>
-<div class="send-message-form" >
-    <form action="/send-ticket" method="post" class="send-message-form" id="form">
+<div class="send-message-wrapper">
+    <form action="/send-ticket" method="post" id="form">
         <p>نام کاربری: </p>
-        <input type="text" value="{{ session.data.username }}" name="uesrname" id="username" disabled required>
+        <input type="text" value="{{ session.data.username }}" name="username" id="username" readonly required>
         <p>پیام:</p>
         <textarea name="message" id="send-message" class="send-message" required></textarea>
     </form>
-
-    <button class="send_message" onclick="javascript:send_message();">ارسال</button>
+    <button class="send_message" onclick="send_message()">ارسال</button>
 </div>
 
 <script>
-    var message = document.getElementById("send-message");
-    var username = document.getElementById("username");
-    var form = document.getElementById("form");
     function send_message() {
+        var message = document.getElementById("send-message");
+        var form = document.getElementById("form");
+        
         if (message.value.trim() === "") {
             alert("پیام خالی ارسال نمیشه.");
-        }
-        else {
-            form.submit()
-            username.disabled = false
+        } else {
+            form.submit();
         }
     }
 </script>
