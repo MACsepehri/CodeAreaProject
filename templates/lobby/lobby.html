@@ -1,0 +1,93 @@
+{% extends "base/base.html" %}
+
+{% block head %}
+<style>
+    body {
+        overflow-x: hidden;
+    }
+
+    .unselected {
+        color: rgb(255, 103, 103);
+    }
+    
+    .select-language button, .select-defficulty button {
+        cursor: pointer;
+        margin: 0 3px;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #f0f0f0;
+        transition: all 0.3s;
+    }
+    
+    .select-language button:hover, .select-defficulty button:hover {
+        background: #e0e0e0;
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div style="display: none;">
+    <input type="text" value="{{ lobby.admin }}" id="owner">
+    <input type="text" value="{{ lobby.lobbyID }}" id="id">
+    <input type="text" id="apiPath" value="http://127.0.0.1:5000/get_lobby_data?id={{ lobby.lobbyID }}">
+</div>
+<div class="right-side right">
+    <div class="inner-header">
+        <h2>ساخت لابی</h2>
+        <p>مدیر : {{ lobby.admin }}</p>
+        <p>تعداد افراد : <strong class="users-list">-</strong></p>
+        <p>زبان برنامه نویسی: <strong id="programing-language" dir="ltr">-</strong></p>
+        <p>درجه سختی: <strong id="defficulty">-</strong></p>
+        <p>شماره لابی: <strong id="lobby-id">{{ lobby.lobbyID }}</strong></p>
+        <input type="hidden" value="{{ lobby.lobbyID }}" id="id">
+    </div>
+    {% if session.lobby_admin %}
+        <div class="hr"></div>
+        <br>
+        <div class="lobby-option">
+            <span class="select-language">انتخاب زبان :
+                <button title="Python">Python</button>
+                <button title="HTML">HTML</button>
+                <button title="CSS">CSS</button>
+                <button title="Javascript">Javascript</button>
+                <button title="Typescript">Typescript</button>
+                <button title="C#">C#</button>
+                <button title="C++">C++</button>
+                <button title="C">C</button>
+            </span>
+            <br>
+            <br>
+            <span class="select-defficulty">
+                درجه ی سختی :
+                <button title="آسان">آسان</button>
+                <button title="متوسط">متوسط</button>
+                <button title="سخت">سخت</button>
+                <button title="غیر ممکن">غیر ممکن</button>
+            </span>
+            <br><br>
+            <div class="start-button">
+                <form action="/start" method="POST">
+                    <input type="hidden" name="language" id="language_f">
+                    <input type="hidden" name="defficulty" id="defficulty_f">
+                    <input type="hidden" name="lobby_id" value="{{ lobby.lobbyID }}">
+                    <button type="submit" onclick="send_data_to_server()">شروع مسابقه</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="wait">
+            <p>در انتظار اپراتور برای شروع مسابقه ...</p>
+        </div>
+    {% endif %}
+    
+    <div class="show-lobby-id">
+        <input type="text" id="lobby_id" value="{{ lobby.lobbyID }}" readonly>
+        <button onclick="copy_element()">کپی لینک</button>
+        <button onclick="javascript:exit_lobby();">خروج از لابی.</button>
+    </div>
+</div>
+
+<script src="/static/js/lobby.js"></script>
+{% endblock %}
