@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+
+{% block head %}
+<style>
+    .send-message {
+        width: 400px;
+        height: 200px;
+        resize: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="title">
+    <h2>ارسال پیام به ما</h2>
+</div>
+<div class="send-message-form" >
+    <form action="/send-ticket" method="post" class="send-message-form" id="form">
+        <p>نام کاربری: </p>
+        <input type="text" value="{{ session.data.username }}" name="uesrname" disabled required>
+        <p>پیام:</p>
+        <textarea name="message" id="send-message" class="send-message" required></textarea>
+    </form>
+
+    <button class="send_message" onclick="javascript:send_message();">ارسال</button>
+</div>
+
+<script>
+    var message = document.getElementById("send-message");
+    var form = document.getElementById("form");
+    function send_message() {
+        if (message.value.trim() === "") {
+            alert("پیام خالی ارسال نمیشه.");
+        }
+        else {
+            form.submit()
+        }
+    }
+</script>
+{% endblock %}
