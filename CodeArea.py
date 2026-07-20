@@ -152,7 +152,7 @@ def logout():
 def report():
     if not session_check():
         return redirect("/")
-    return render_template("report.html")
+    return render_template("report.html", session=session)
 
 @app.route("/lobby&id=<lobbyID>")
 def render_lobby(lobbyID):
@@ -320,6 +320,10 @@ def debug_lobby(lobbyID):
     if data:
         return jsonify(data)
     return jsonify({"error": "Lobby not found"}), 404
+
+@app.route("/send-ticket", methods=["POST"])
+def send_ticket():
+    pass
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
