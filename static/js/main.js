@@ -23,7 +23,7 @@ function password_state() {
 }
 
 function password_is_week() {
-    if (password != repeat_password) {
+    if (password.value != repeat_password.value) {
         alert("رمز عبور ها برابر نیستند.");
     }
     else {
