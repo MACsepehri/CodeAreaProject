@@ -325,33 +325,37 @@ def debug_lobby(lobbyID):
 @app.route("/send-ticket", methods=["POST"])
 def send_ticket():
     if request.method == "POST":
+        if not session_check():
+            return redirect("/")
         username = request.form.get("username", None)
         message = request.form.get("message", None)
         
         if not username or not message:
             return redirect("/")
         
-        # Connect to database
-        conn = sqlite3.connect("static/report/message.db")
-        cur = conn.cursor()
-        
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS tickets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
-                message TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        
-        cur.execute(
-            "INSERT INTO tickets (username, message) VALUES (?, ?)",
-            (username, message)
-        )
+        for data in json.load(open("static/user/data.json", "r"))["users"]:
+            if data["username"] == username:
+                conn = sqlite3.connect("static/report/message.db")
+                cur = conn.cursor()
+                
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS tickets (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT NOT NULL,
+                        message TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                
+                cur.execute(
+                    "INSERT INTO tickets (username, message) VALUES (?, ?)",
+                    (username, message)
+                )
 
-        conn.commit()
-        conn.close()
+                conn.commit()
+                conn.close()
 
+                return redirect("/")
         return redirect("/")
     return redirect("/")
 
