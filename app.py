@@ -4,11 +4,13 @@ import time
 import os
 import sqlite3
 import openai
+import requests
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
 API = "sk-Ea2RmoBw78oPciF4pbiN4xmXj33mgMoLX5nOGVcD8tKCscRu"
+client = openai.OpenAI(base_url='https://api.gapgpt.app/v1', api_key=API)
 
 @app.after_request
 def after_request(response):
@@ -106,6 +108,7 @@ def create_lobby():
                 "lobbyID": lobbyID,
                 "language": "-",
                 "defficulty": "-",
+                "questions": [],
                 "users_list": [session["data"]["username"]],
                 "user_data": [
                     {
@@ -294,11 +297,16 @@ def start_game():
             json.dump(lobby_data, file, indent=4)
     
     print(f"Starting game with language: {language}, difficulty: {defficulty}, lobby: {lobby_id}")
+
+    r = requests.get(f"http://127.0.0.1:5000/connect_to_ai/get_question_list/{language}/{defficulty}").text.split("\n")
+    print(r)
+    q = r
     
     return render_template("start/start.html", 
                           language=language, 
                           defficulty=defficulty,
-                          lobby_id=lobby_id)
+                          lobby_id=lobby_id,
+                          question=q)
 
 @app.route("/leave_lobby&id=<lobbyID>")
 def leave_lobby(lobbyID):
@@ -379,7 +387,15 @@ def send_ticket():
 
 @app.route("/connect_to_ai/get_question_list/<language>/<defficulty>")
 def get_question_list(language, defficulty):
-    pass
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": "Don't answer my question and don't say Okay sure or somethink like this. just do something I wanna say. Give me a python list with 3 programming questions. Language: {} and Defficulty: {}. Just 3 questions like a python list. I mean 'q1', 'q2', 'q3'. I mean no [] just seperate them with , . Just write the questions in Persian and don't write any ``` and becareful user must write code for answer and write the list in one line. Example :\n'question1' , 'question2' , 'question3'\nYour result must like something I said up there. Just send them 1 time. Not send 3 question 100 times in row.".format(language, defficulty)}
+        ]
+    )
+
+    return response.choices[0].message.content
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
