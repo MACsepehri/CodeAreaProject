@@ -10,7 +10,9 @@ app = Flask(__name__)
 app.secret_key = "secret_key"
 
 API = "sk-Ea2RmoBw78oPciF4pbiN4xmXj33mgMoLX5nOGVcD8tKCscRu"
+API2 = "sk-OPbp3cPC5oS56uVVNRcIIbZmO3lcXkV1MeQoWmJEk4ZWvAeB"
 client = openai.OpenAI(base_url='https://api.gapgpt.app/v1', api_key=API)
+client2 = openai.OpenAI(base_url='https://api.gapgpt.app/v1', api_key=API2)
 
 @app.after_request
 def after_request(response):
@@ -396,6 +398,16 @@ def get_question_list(language, defficulty):
 
     return response.choices[0].message.content
 
+@app.route("/connect_to_ai/question_status/<question>/<language>/<text>")
+def return_question_status(question, language, text):
+    response = client2.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": "Don't answer my question and don't say Okay sure or somethink like this. just do something I wanna say.Just I wanna send you a programming question, the programming language and the code, if the code was the worst code in the world but it was the question answer, say True, just it is 3 questions and you must send me the result like this:\n'True', 'False', 'True'\nThe 'True' or 'False' was example. If the answer was okay it must be true for question number eles False. Question list:{}, {}, {}\nlanguage: {}.\nAnswers:{}, {}, {}]\nNow get me answer.".format(question[0], question[1], question[2], language, text[0], text[1], text[2])}
+        ]
+    )
+
+    return response.choices[0].message.content
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
