@@ -213,7 +213,9 @@ def get_lobby_data():
                 "defficulty": data.get("defficulty", "-"),
                 "admin": data.get("admin", ""),
                 "users_list": data.get("users_list", [data.get("admin")]),
-                "user_data": data.get("user_data", [])
+                "user_data": data.get("user_data", []),
+                "game_started": data.get("game_started", False),
+                "game_start_time": data.get("game_start_time", None)
             }
             return jsonify(response_data)
         else:
