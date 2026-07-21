@@ -222,6 +222,57 @@ function send_data_to_server() {
     }
 }
 
+async function checkGameStarted() {
+    try {
+        const currentLobbyID = getLobbyID();
+        if (!currentLobbyID) {
+            return;
+        }
+
+        const endpoint = `/get_lobby_data?id=${currentLobbyID}`;
+        const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (data.game_started === true) {
+            const language = data.language || '-';
+            const defficulty = data.defficulty || '-';
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/start';
+            
+            const languageInput = document.createElement('input');
+            languageInput.type = 'hidden';
+            languageInput.name = 'language';
+            languageInput.value = language;
+            form.appendChild(languageInput);
+            
+            const defficultyInput = document.createElement('input');
+            defficultyInput.type = 'hidden';
+            defficultyInput.name = 'defficulty';
+            defficultyInput.value = defficulty;
+            form.appendChild(defficultyInput);
+            
+            const lobbyInput = document.createElement('input');
+            lobbyInput.type = 'hidden';
+            lobbyInput.name = 'lobby_id';
+            lobbyInput.value = currentLobbyID;
+            form.appendChild(lobbyInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+    } catch (error) {
+        console.error("Error checking game state:", error);
+    }
+}
+
 function initializeLobby() {
     const ownerInput = document.getElementById("owner");
     if (ownerInput && ownerInput.value) {
@@ -270,7 +321,6 @@ function initializeLobby() {
             const func = difficultyMap[title];
             if (func) {
                 func();
-            } else {
             }
         });
     } else {
@@ -286,6 +336,9 @@ function initializeLobby() {
         updateLobbyUsers();
         setInterval(updateLobbyUsers, 3000);
     }
+    
+    checkGameStarted();
+    setInterval(checkGameStarted, 2000);
 }
 
 if (document.readyState === 'loading') {
