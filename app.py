@@ -110,7 +110,9 @@ def create_lobby():
                         "answers": [],
                         "answer_data": []
                     }
-                ]
+                ],
+                "game_started": False,
+                "game_start_time": None
             }
             
             with open(f"static/lobby/{session['data']['username']}-lobby.json", "w") as file:
