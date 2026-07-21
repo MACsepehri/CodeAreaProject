@@ -277,6 +277,20 @@ def start_game():
     defficulty = request.form.get("defficulty", "-")
     lobby_id = request.form.get("lobby_id", "")
     
+    lobby_data = find_lobby_data(lobby_id)
+    if lobby_data:
+        if session.get("data", {}).get("username") != lobby_data.get("admin"):
+            return jsonify({"error": "Only admin can start the game"}), 403
+        
+        lobby_data["game_started"] = True
+        lobby_data["game_start_time"] = time.time()
+        lobby_data["language"] = language
+        lobby_data["defficulty"] = defficulty
+        
+        file_path = f"static/lobby/{lobby_data['admin']}-lobby.json"
+        with open(file_path, "w") as file:
+            json.dump(lobby_data, file, indent=4)
+    
     print(f"Starting game with language: {language}, difficulty: {defficulty}, lobby: {lobby_id}")
     
     return render_template("game/start.html", 
