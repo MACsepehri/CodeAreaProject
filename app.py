@@ -3,9 +3,12 @@ import json
 import time
 import os
 import sqlite3
+import openai
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
+
+API = "sk-Ea2RmoBw78oPciF4pbiN4xmXj33mgMoLX5nOGVcD8tKCscRu"
 
 @app.after_request
 def after_request(response):
@@ -373,6 +376,10 @@ def send_ticket():
                 return redirect("/")
         return redirect("/")
     return redirect("/")
+
+@app.route("/connect_to_ai/get_question_list/<language>/<defficulty>")
+def get_question_list(language, defficulty):
+    pass
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
