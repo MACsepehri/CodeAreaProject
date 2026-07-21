@@ -37,13 +37,13 @@ def login(username, email, password):
     global session
 
     os.makedirs("static/user", exist_ok=True)
-    
+
     if os.path.exists("static/user/data.json"):
         with open("static/user/data.json", "r") as file:
             data = json.load(file)
     else:
         data = {"users": []}
-    
+
     for user in data["users"]:
         if user["username"] == username or user["email"] == email:
             if user["username"] == username and user["email"] == email and user["password"] == password:
@@ -51,18 +51,18 @@ def login(username, email, password):
                 session["login"] = True
                 return True
             return False
-    
+
     data["users"].append({"username": username, "email": email, "password": password})
     with open("static/user/data.json", "w") as file:
         json.dump(data, file, indent=4)
-    
+
     session["login"] = True
     session["data"] = {"username": username, "email": email, "password": password}
     return True
 
 def find_lobby_data(lobbyID):
     os.makedirs("static/lobby", exist_ok=True)
-    
+
     try:
         path = os.listdir("static/lobby")
         for p in path:
@@ -101,9 +101,9 @@ def create_lobby():
             lobbyID = str(time.time()).replace(".", "_")
             session["lobby_admin"] = True
             session["in_lobby"] = True
-            
+
             os.makedirs("static/lobby", exist_ok=True)
-            
+
             lobby_data = {
                 "admin": session["data"]["username"],
                 "users": 1,
@@ -122,13 +122,13 @@ def create_lobby():
                 "game_started": False,
                 "game_start_time": None
             }
-            
+
             with open(f"static/lobby/{session['data']['username']}-lobby.json", "w") as file:
                 json.dump(lobby_data, file, indent=4)
             return redirect(f"/lobby&id={lobbyID}")
         else:
             return redirect("/")
-        
+
 @app.route("/register", methods=["POST"])
 def register():
     if request.method == "POST":
@@ -136,16 +136,16 @@ def register():
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
         r_password = request.form.get("repeat_password", "")
-        
+
         if not username or not email or not password:
             return render_template("exception/error.html", msg="همه فیلدها باید پر شوند.")
-        
+
         elif password != r_password:
             return render_template("exception/error.html", msg="رمز عبور یکسان نیست.")
-        
+
         if not (email.endswith("@gmail.com") or email.endswith("@email.com")):
             return render_template("exception/error.html", msg="ایمیل نامعتبر")
-        
+
         login_check = login(username, email, password)
         if not login_check:
             return render_template("exception/error.html", msg="یکی از داده ها برای کاربر دیگری صدق میکند.")
@@ -169,28 +169,28 @@ def report():
 def render_lobby(lobbyID):
     if not session_check():
         return redirect("/")
-    
+
     data = find_lobby_data(lobbyID)
     if not data:
         return render_template("exception/error.html", msg="لابی پیدا نشد.")
 
     if session.get("login"):
         username = session.get("data", {}).get("username")
-        
+
         if username != data["admin"]:
             if "users_list" not in data:
                 data["users_list"] = []
             if "user_data" not in data:
                 data["user_data"] = []
-            
+
             user_exists = False
             for user in data["user_data"]:
                 if user.get("name") == username:
                     user_exists = True
                     break
-            
+
                 data["users_list"].append(username)
-                
+
                 new_user_data = {
                     "name": username,
                     "answers": [],
@@ -198,20 +198,20 @@ def render_lobby(lobbyID):
                 }
                 data["user_data"].append(new_user_data)
                 data["users"] = len(data["users_list"])
-                
+
                 with open(f"static/lobby/{data['admin']}-lobby.json", "w") as file:
                     json.dump(data, file, indent=4)
-    
+
     return render_template("lobby/lobby.html", lobby=data, session=session)
 
 @app.route("/get_lobby_data")
 def get_lobby_data():
     try:
         lobbyID = request.args.get("id")
-        
+
         if not lobbyID:
             return jsonify({"error": "Missing lobby ID"}), 400
-        
+
         data = find_lobby_data(lobbyID)
         if data:
             response_data = {
@@ -230,11 +230,11 @@ def get_lobby_data():
             return jsonify({"error": "Lobby not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 @app.route("/update_lobby_data", methods=["POST"])
-def update_lobby_data():
+def update_lobby_data2():
     try:
-        
+
         if request.content_type and 'application/json' in request.content_type:
             data = request.get_json()
             lobby_id = data.get("lobby_id")
@@ -244,37 +244,37 @@ def update_lobby_data():
             lobby_id = request.form.get("lobby_id")
             field = request.form.get("field")
             value = request.form.get("value")
-        
+
         if not lobby_id:
             return jsonify({"error": "Missing lobby_id"}), 400
-        
+
         if not field:
             return jsonify({"error": "Missing field"}), 400
-        
+
         lobby_data = find_lobby_data(lobby_id)
         if not lobby_data:
             return jsonify({"error": "Lobby not found"}), 404
-        
+
         if session.get("data", {}).get("username") != lobby_data.get("admin"):
             return jsonify({"error": "Only admin can change lobby settings"}), 403
-        
+
         if field == "language":
             lobby_data["language"] = value
         elif field == "defficulty":
             lobby_data["defficulty"] = value
         else:
             return jsonify({"error": "Invalid field"}), 400
-        
+
         file_path = f"static/lobby/{lobby_data['admin']}-lobby.json"
         with open(file_path, "w") as file:
             json.dump(lobby_data, file, indent=4)
-        
+
         return jsonify({
-            "success": True, 
+            "success": True,
             "message": f"{field} updated successfully",
             "data": lobby_data
         })
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -282,30 +282,30 @@ def update_lobby_data():
 def start_game():
     if not session_check():
         return redirect("/")
-    
+
     language = request.form.get("language", "-")
     defficulty = request.form.get("defficulty", "-")
     lobby_id = request.form.get("lobby_id", "")
-    
+
     lobby_data = find_lobby_data(lobby_id)
     if lobby_data:
         lobby_data["game_started"] = True
         lobby_data["game_start_time"] = time.time()
         lobby_data["language"] = language
         lobby_data["defficulty"] = defficulty
-        
+
         file_path = f"static/lobby/{lobby_data['admin']}-lobby.json"
         with open(file_path, "w") as file:
             json.dump(lobby_data, file, indent=4)
-    
+
     print(f"Starting game with language: {language}, difficulty: {defficulty}, lobby: {lobby_id}")
 
-    r = requests.get(f"http://127.0.0.1:5000/connect_to_ai/get_question_list/{language}/{defficulty}").text.split("\n")
+    r = requests.get(f"http://codeareaproject.pythonanywhere.com/connect_to_ai/get_question_list/{language}/{defficulty}").text.split("\n")
     print(r)
     q = r
-    
-    return render_template("start/start.html", 
-                          language=language, 
+
+    return render_template("start/start.html",
+                          language=language,
                           defficulty=defficulty,
                           lobby_id=lobby_id,
                           question=q)
@@ -357,15 +357,15 @@ def send_ticket():
             return redirect("/")
         username = request.form.get("username", None)
         message = request.form.get("message", None)
-        
+
         if not username or not message:
             return redirect("/")
-        
+
         for data in json.load(open("static/user/data.json", "r"))["users"]:
             if data["username"] == username:
                 conn = sqlite3.connect("static/report/message.db")
                 cur = conn.cursor()
-                
+
                 cur.execute("""
                     CREATE TABLE IF NOT EXISTS tickets (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -374,7 +374,7 @@ def send_ticket():
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
-                
+
                 cur.execute(
                     "INSERT INTO tickets (username, message) VALUES (?, ?)",
                     (username, message)
