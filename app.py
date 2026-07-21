@@ -281,9 +281,6 @@ def start_game():
     
     lobby_data = find_lobby_data(lobby_id)
     if lobby_data:
-        if session.get("data", {}).get("username") != lobby_data.get("admin"):
-            return jsonify({"error": "Only admin can start the game"}), 403
-        
         lobby_data["game_started"] = True
         lobby_data["game_start_time"] = time.time()
         lobby_data["language"] = language
@@ -295,7 +292,7 @@ def start_game():
     
     print(f"Starting game with language: {language}, difficulty: {defficulty}, lobby: {lobby_id}")
     
-    return render_template("game/start.html", 
+    return render_template("start/start.html", 
                           language=language, 
                           defficulty=defficulty,
                           lobby_id=lobby_id)
